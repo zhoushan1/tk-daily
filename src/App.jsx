@@ -8,6 +8,7 @@ function App() {
   const [blob, setBlob] = useState(null);
   const refVideo = useRef(null);
   const recorderRef = useRef(null);
+  const chunksRef = useRef([]);
 
   const handleStart = async () => {
     const mediaStream = await navigator.mediaDevices.getDisplayMedia({
@@ -26,16 +27,24 @@ function App() {
 
   const handleStop = () => {
     recorderRef.current.stopRecording(() => {
-      setBlob(recorderRef.current.getBlob());
+      const curBlob = recorderRef.current.getBlob()
+      setBlob(curBlob);
+      chunksRef.current.push(curBlob);
+      const videoBlob = new Blob(chunksRef.current, { type: 'video/mp4' });
+      const videoUrl = window.URL.createObjectURL(videoBlob);
+      const a = document.createElement("a");
+      a.href = videoUrl;
+      a.download = "video.mp4";
+      a.click();
     });
   };
 
   const handleSave = () => {
     // invokeSaveAsDialog(blob);
-    const a = document?.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "video.webm";
-    a.click();
+    // const a = document?.createElement("a");
+    // a.href = URL.createObjectURL(blob);
+    // a.download = "video.webm";
+    // a.click();
   };
 
   useEffect(() => {
